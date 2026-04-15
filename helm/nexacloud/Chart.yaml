@@ -1,0 +1,6 @@
+apiVersion: v2
+name: nexacloud
+description: NexaCloud Self-Healing Enterprise DevOps Platform
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
