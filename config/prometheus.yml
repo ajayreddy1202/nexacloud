@@ -1,0 +1,27 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'nexacloud-auth'
+    static_configs:
+      - targets: ['auth-service:8000']
+
+  - job_name: 'nexacloud-user'
+    static_configs:
+      - targets: ['user-service:8001']
+
+  - job_name: 'nexacloud-product'
+    static_configs:
+      - targets: ['product-service:8002']
+
+  - job_name: 'nexacloud-order'
+    static_configs:
+      - targets: ['order-service:8003']
+
+  - job_name: 'nexacloud-notification'
+    static_configs:
+      - targets: ['notification-service:8004']
+
+  - job_name: 'nexacloud-payment'
+    static_configs:
+      - targets: ['payment-service:8005']
