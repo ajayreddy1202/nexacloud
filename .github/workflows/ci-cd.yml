@@ -1,0 +1,44 @@
+name: NexaCloud CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-auth-service:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          cd services/auth-service
+          pip install -r requirements.txt
+      - name: Run migrations
+        run: |
+          cd services/auth-service
+          python manage.py migrate
+      - name: Run tests
+        run: |
+          cd services/auth-service
+          python manage.py test
+
+  build-and-push:
+    needs: test-auth-service
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build Docker images
+        run: |
+          docker-compose build
+      - name: Verify containers
+        run: |
+          docker-compose up -d
+          sleep 10
+          docker ps
+          docker-compose down
