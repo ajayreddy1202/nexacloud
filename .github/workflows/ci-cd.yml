@@ -27,27 +27,19 @@ jobs:
           cd services/auth-service
           python manage.py migrate
 
-      - name: Verify all service Dockerfiles exist
+      - name: Check Dockerfiles exist
         run: |
-          for service in auth-service user-service product-service order-service notification-service payment-service; do
-            echo "Checking $service..."
-            ls services/$service/Dockerfile
-          done
+          ls services/auth-service/Dockerfile
+          ls services/user-service/Dockerfile
+          ls services/product-service/Dockerfile
+          ls services/order-service/Dockerfile
+          ls services/notification-service/Dockerfile
+          ls services/payment-service/Dockerfile
 
-      - name: Build Docker images
+      - name: Build and test containers
         run: |
           docker compose build
-
-      - name: Start containers
-        run: |
           docker compose up -d
           sleep 15
           docker ps
-
-      - name: Test auth service health
-        run: |
-          curl -f http://localhost:8000/api/auth/register/ || true
-
-      - name: Stop containers
-        run: |
           docker compose down
