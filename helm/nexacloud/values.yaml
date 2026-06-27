@@ -1,0 +1,25 @@
+services:
+  auth:
+    image: nexacloud_auth-service
+    port: 8000
+    replicas: 2
+  user:
+    image: nexacloud_user-service
+    port: 8001
+    replicas: 2
+  product:
+    image: nexacloud_product-service
+    port: 8002
+    replicas: 2
+  order:
+    image: nexacloud_order-service
+    port: 8003
+    replicas: 2
+  notification:
+    image: nexacloud_notification-service
+    port: 8004
+    replicas: 2
+  payment:
+    image: nexacloud_payment-service
+    port: 8005
+    replicas: 2
