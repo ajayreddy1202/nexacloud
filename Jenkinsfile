@@ -17,21 +17,29 @@ pipeline {
 
         stage('Show Files') {
             steps {
-                sh 'pwd'
-                sh 'ls -la'
+                sh '''
+                    pwd
+                    ls -la
+                '''
             }
         }
 
         stage('Build Docker Images') {
             steps {
-                sh 'docker compose build'
+                sh '''
+                    cd /home/ubuntu/nexacloud
+                    docker compose build
+                '''
             }
         }
 
         stage('Deploy Containers') {
             steps {
                 sh '''
+                    cd /home/ubuntu/nexacloud
+
                     docker compose down || true
+
                     docker compose up -d --build
                 '''
             }
@@ -39,7 +47,9 @@ pipeline {
 
         stage('Verify Deployment') {
             steps {
-                sh 'docker ps'
+                sh '''
+                    docker ps
+                '''
             }
         }
 
@@ -48,15 +58,19 @@ pipeline {
     post {
 
         success {
-            echo '======================================='
-            echo 'NexaCloud Deployment Successful'
-            echo '======================================='
+            echo '========================================'
+            echo ' NexaCloud Deployment Successful '
+            echo '========================================'
         }
 
         failure {
-            echo '======================================='
-            echo 'Deployment Failed'
-            echo '======================================='
+            echo '========================================'
+            echo ' NexaCloud Deployment Failed '
+            echo '========================================'
+        }
+
+        always {
+            cleanWs()
         }
 
     }
