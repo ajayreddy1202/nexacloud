@@ -2,6 +2,10 @@ pipeline {
 
     agent any
 
+    tools {
+        sonarQubeScanner 'SonarScanner'
+    }
+
     environment {
         PROJECT_NAME = "nexacloud"
     }
@@ -15,12 +19,19 @@ pipeline {
             }
         }
 
-        stage('Show Files') {
+        stage('SonarQube Analysis') {
             steps {
-                sh '''
-                    pwd
-                    ls -la
-                '''
+                withSonarQubeEnv('SonarQube') {
+                    sh '''
+                        cd /home/ubuntu/nexacloud
+
+                        SonarScanner/bin/sonar-scanner \
+                        -Dsonar.projectKey=nexacloud \
+                        -Dsonar.sources=. \
+                        -Dsonar.host.url=http://15.206.131.219:9000 \
+                        -Dsonar.login=$SONAR_AUTH_TOKEN
+                    '''
+                }
             }
         }
 
@@ -29,6 +40,7 @@ pipeline {
                 timeout(time: 30, unit: 'MINUTES') {
                     sh '''
                         cd /home/ubuntu/nexacloud
+
                         docker compose build --no-cache
                     '''
                 }
@@ -51,32 +63,27 @@ pipeline {
 
         stage('Verify Deployment') {
             steps {
-                sh '''
-                    docker ps
-                '''
+                sh 'docker ps'
             }
         }
-
     }
 
     post {
 
         success {
             echo '========================================'
-            echo ' NexaCloud Deployment Successful '
+            echo 'NexaCloud Deployment Successful'
             echo '========================================'
         }
 
         failure {
             echo '========================================'
-            echo ' NexaCloud Deployment Failed '
+            echo 'NexaCloud Deployment Failed'
             echo '========================================'
         }
 
         always {
             cleanWs()
         }
-
     }
-
 }
