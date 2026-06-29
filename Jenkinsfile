@@ -2,10 +2,6 @@ pipeline {
 
     agent any
 
-    tools {
-        sonarRunner 'SonarScanner'
-    }
-
     environment {
         PROJECT_NAME = "nexacloud"
     }
@@ -35,10 +31,10 @@ pipeline {
                         cd /home/ubuntu/nexacloud
 
                         sonar-scanner \
-                        -Dsonar.projectKey=nexacloud \
-                        -Dsonar.sources=. \
-                        -Dsonar.host.url=$SONAR_HOST_URL \
-                        -Dsonar.token=$SONAR_AUTH_TOKEN
+                          -Dsonar.projectKey=nexacloud \
+                          -Dsonar.sources=. \
+                          -Dsonar.host.url=$SONAR_HOST_URL \
+                          -Dsonar.token=$SONAR_AUTH_TOKEN
                     '''
                 }
             }
@@ -49,7 +45,6 @@ pipeline {
                 timeout(time: 30, unit: 'MINUTES') {
                     sh '''
                         cd /home/ubuntu/nexacloud
-
                         docker compose build --no-cache
                     '''
                 }
@@ -61,9 +56,7 @@ pipeline {
                 timeout(time: 15, unit: 'MINUTES') {
                     sh '''
                         cd /home/ubuntu/nexacloud
-
                         docker compose down || true
-
                         docker compose up -d
                     '''
                 }
@@ -72,12 +65,9 @@ pipeline {
 
         stage('Verify Deployment') {
             steps {
-                sh '''
-                    docker ps
-                '''
+                sh 'docker ps'
             }
         }
-
     }
 
     post {
@@ -97,7 +87,5 @@ pipeline {
         always {
             cleanWs()
         }
-
     }
-
 }
