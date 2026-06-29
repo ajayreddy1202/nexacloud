@@ -32,8 +32,7 @@ pipeline {
                         cd /home/ubuntu/nexacloud
 
                         ${SCANNER_HOME}/bin/sonar-scanner \
-                        -Dsonar.projectKey=nexacloud \
-                        -Dsonar.sources=. \
+                        -Dproject.settings=sonar-project.properties \
                         -Dsonar.host.url=$SONAR_HOST_URL \
                         -Dsonar.token=$SONAR_AUTH_TOKEN
                     """
@@ -69,23 +68,26 @@ pipeline {
 
         stage('Verify Deployment') {
             steps {
-                sh 'docker ps'
+                sh '''
+                    docker ps
+                '''
             }
         }
+
     }
 
     post {
 
         success {
-            echo '========================================'
-            echo 'NexaCloud Deployment Successful'
-            echo '========================================'
+            echo "========================================"
+            echo "NexaCloud Deployment Successful"
+            echo "========================================"
         }
 
         failure {
-            echo '========================================'
-            echo 'NexaCloud Deployment Failed'
-            echo '========================================'
+            echo "========================================"
+            echo "NexaCloud Deployment Failed"
+            echo "========================================"
         }
 
         always {
