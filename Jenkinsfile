@@ -3,7 +3,7 @@ pipeline {
     agent any
 
     tools {
-        sonarQubeScanner 'SonarScanner'
+        sonarRunner 'SonarScanner'
     }
 
     environment {
@@ -19,17 +19,26 @@ pipeline {
             }
         }
 
+        stage('Show Files') {
+            steps {
+                sh '''
+                    pwd
+                    ls -la
+                '''
+            }
+        }
+
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
                     sh '''
                         cd /home/ubuntu/nexacloud
 
-                        SonarScanner/bin/sonar-scanner \
+                        sonar-scanner \
                         -Dsonar.projectKey=nexacloud \
                         -Dsonar.sources=. \
-                        -Dsonar.host.url=http://15.206.131.219:9000 \
-                        -Dsonar.login=$SONAR_AUTH_TOKEN
+                        -Dsonar.host.url=$SONAR_HOST_URL \
+                        -Dsonar.token=$SONAR_AUTH_TOKEN
                     '''
                 }
             }
@@ -63,9 +72,12 @@ pipeline {
 
         stage('Verify Deployment') {
             steps {
-                sh 'docker ps'
+                sh '''
+                    docker ps
+                '''
             }
         }
+
     }
 
     post {
@@ -85,5 +97,7 @@ pipeline {
         always {
             cleanWs()
         }
+
     }
+
 }
