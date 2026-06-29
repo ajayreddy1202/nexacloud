@@ -26,22 +26,26 @@ pipeline {
 
         stage('Build Docker Images') {
             steps {
-                sh '''
-                    cd /home/ubuntu/nexacloud
-                    docker compose build
-                '''
+                timeout(time: 30, unit: 'MINUTES') {
+                    sh '''
+                        cd /home/ubuntu/nexacloud
+                        docker compose build --no-cache
+                    '''
+                }
             }
         }
 
         stage('Deploy Containers') {
             steps {
-                sh '''
-                    cd /home/ubuntu/nexacloud
+                timeout(time: 15, unit: 'MINUTES') {
+                    sh '''
+                        cd /home/ubuntu/nexacloud
 
-                    docker compose down || true
+                        docker compose down || true
 
-                    docker compose up -d --build
-                '''
+                        docker compose up -d
+                    '''
+                }
             }
         }
 
