@@ -12,6 +12,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 import { placeOrder } from "../../services/orderService";
+import { processPayment } from "../../services/paymentService";
+import { sendNotification } from "../../services/notificationService";
 import { clearCart } from "../../redux/slices/cartSlice";
 
 function Checkout() {
@@ -68,20 +70,33 @@ function Checkout() {
       })),
     };
 
-    // Debug
-    console.log("Order Data:");
-    console.log(orderData);
-
-    alert(JSON.stringify(orderData, null, 2));
-
     try {
-      const response = await placeOrder(orderData);
+      // Create Order
+      const orderResponse = await placeOrder(orderData);
 
-      console.log(response);
+      // Process Payment
+      const paymentData = {
+        order_id: orderResponse.data.id,
+        user_id: user.id,
+        amount: total,
+        payment_method: "upi",
+      };
+
+      await processPayment(paymentData);
+
+      // Send Notification
+      await sendNotification({
+        user_id: user.id,
+        notification_type: "push",
+        subject: "Order Placed",
+        message: `🎉 Your order #${orderResponse.data.id} has been placed successfully.`,
+        email: user.email,
+        phone: user.phone || "",
+      });
 
       dispatch(clearCart());
 
-      alert("Order Placed Successfully");
+      alert("🎉 Order Placed, Payment Successful & Notification Sent");
 
       navigate("/orders");
     } catch (error) {
@@ -97,7 +112,11 @@ function Checkout() {
 
   return (
     <Container maxWidth="md" sx={{ py: 6 }}>
-      <Typography variant="h4" fontWeight="bold" mb={4}>
+      <Typography
+        variant="h4"
+        fontWeight="bold"
+        mb={4}
+      >
         💳 Checkout
       </Typography>
 
@@ -158,7 +177,7 @@ function Checkout() {
             size="large"
             onClick={handlePlaceOrder}
           >
-            Place Order
+            Place Order & Pay
           </Button>
         </Stack>
       </Paper>

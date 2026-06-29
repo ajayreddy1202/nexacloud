@@ -1,9 +1,11 @@
 import axios from "axios";
 
-export const getProducts = async () => {
-  const response = await axios.get(
-    "http://15.206.131.219:8002/api/products/"
-  );
+const api = axios.create({
+  baseURL: "http://15.206.131.219",
+});
 
+export const getProducts = async () => {
+  const response = await api.get("/api/products/");
+  console.log("Products API Response:", response.data);
   return response.data.data;
 };

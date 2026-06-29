@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import {
   Container,
-  Grid,
   Typography,
   CircularProgress,
   Box,
@@ -19,72 +18,59 @@ function ProductSection() {
 
   useEffect(() => {
     async function loadProducts() {
-      try {
-        const data = await getProducts();
-        setProducts(data);
-        setFilteredProducts(data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
+      const data = await getProducts();
+      setProducts(data);
+      setFilteredProducts(data);
+      setLoading(false);
     }
 
     loadProducts();
   }, []);
 
   useEffect(() => {
-    const filtered = products.filter((product) =>
-      product.name.toLowerCase().includes(search.toLowerCase())
+    setFilteredProducts(
+      products.filter((p) =>
+        p.name.toLowerCase().includes(search.toLowerCase())
+      )
     );
-
-    setFilteredProducts(filtered);
   }, [search, products]);
 
   if (loading) {
     return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          py: 8,
-        }}
-      >
+      <Box sx={{ textAlign: "center", py: 5 }}>
         <CircularProgress />
       </Box>
     );
   }
 
   return (
-    <Container maxWidth="xl" sx={{ py: 8 }}>
-
-      <Typography
-        variant="h4"
-        fontWeight="bold"
-        mb={4}
-      >
+    <Container maxWidth="xl" sx={{ py: 5 }}>
+      <Typography variant="h4" mb={4}>
         🔥 Featured Products
       </Typography>
 
       <TextField
         fullWidth
-        label="Search Products..."
+        label="Search Products"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        sx={{ mb: 5 }}
+        sx={{ mb: 4 }}
       />
 
-      <Grid container spacing={4}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))",
+          gap: "20px",
+        }}
+      >
         {filteredProducts.map((product) => (
-          <Grid
+          <ProductCard
             key={product.id}
-            size={{ xs: 12, sm: 6, md: 4, lg: 3 }}
-          >
-            <ProductCard product={product} />
-          </Grid>
+            product={product}
+          />
         ))}
-      </Grid>
-
+      </div>
     </Container>
   );
 }

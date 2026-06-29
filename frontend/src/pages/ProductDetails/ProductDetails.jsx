@@ -1,36 +1,58 @@
-import { Container, Grid, Typography, Button } from "@mui/material";
+import {
+  Container,
+  Grid,
+  Typography,
+  Button,
+  CircularProgress,
+} from "@mui/material";
+
+import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
+
 import { addToCart } from "../../redux/slices/cartSlice";
+import { getProducts } from "../../services/productService";
 
 function ProductDetails() {
+  const { id } = useParams();
+
   const dispatch = useDispatch();
 
-  const product = {
-    id: 1,
-    name: "Apple iPhone 16 Pro",
-    description:
-      "Experience the latest Apple flagship with titanium design, A18 Pro chip, incredible cameras and all-day battery.",
-    price: 129999,
-    stock: 25,
-    category_name: "Mobiles",
-    image_url:
-      "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1000",
-  };
+  const [product, setProduct] = useState(null);
 
-  const handleAddToCart = () => {
-    dispatch(addToCart(product));
-    alert("Product added to cart");
-  };
+  useEffect(() => {
+    async function loadProduct() {
+      const products = await getProducts();
+
+      const selected = products.find(
+        (item) => item.id === Number(id)
+      );
+
+      setProduct(selected);
+    }
+
+    loadProduct();
+  }, [id]);
+
+  if (!product) {
+    return (
+      <Container sx={{ py: 10, textAlign: "center" }}>
+        <CircularProgress />
+      </Container>
+    );
+  }
 
   return (
-    <Container sx={{ py: 8 }}>
+    <Container maxWidth="lg" sx={{ py: 8 }}>
       <Grid container spacing={6}>
         <Grid size={{ xs: 12, md: 6 }}>
           <img
             src={product.image_url}
             alt={product.name}
             width="100%"
-            style={{ borderRadius: "20px" }}
+            style={{
+              borderRadius: 20,
+            }}
           />
         </Grid>
 
@@ -39,29 +61,33 @@ function ProductDetails() {
             {product.name}
           </Typography>
 
-          <Typography variant="h5" color="primary" mt={2}>
-            ₹{product.price}
+          <Typography
+            variant="h4"
+            color="primary"
+            mt={2}
+          >
+            ₹ {product.price}
           </Typography>
 
-          <Typography mt={3} color="text.secondary">
+          <Typography mt={3}>
             {product.description}
+          </Typography>
+
+          <Typography mt={3}>
+            Category: {product.category_name}
+          </Typography>
+
+          <Typography mt={1}>
+            Stock: {product.stock}
           </Typography>
 
           <Button
             variant="contained"
             size="large"
-            sx={{ mt: 5, mr: 2 }}
-            onClick={handleAddToCart}
-          >
-            Add to Cart
-          </Button>
-
-          <Button
-            variant="outlined"
-            size="large"
             sx={{ mt: 5 }}
+            onClick={() => dispatch(addToCart(product))}
           >
-            Buy Now
+            Add To Cart
           </Button>
         </Grid>
       </Grid>

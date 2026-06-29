@@ -1,11 +1,25 @@
 import { useState } from "react";
+import {
+  Container,
+  Paper,
+  Typography,
+  TextField,
+  Button,
+  Stack,
+  Link,
+  CircularProgress,
+} from "@mui/material";
+
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import { useNavigate } from "react-router-dom";
 import { registerUser } from "../../services/authService";
-import { useNavigate, Link } from "react-router-dom";
 
 function Register() {
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({
+  const [loading, setLoading] = useState(false);
+
+  const [formData, setFormData] = useState({
     username: "",
     email: "",
     phone: "",
@@ -14,74 +28,150 @@ function Register() {
   });
 
   const handleChange = (e) => {
-    setForm({
-      ...form,
+    setFormData({
+      ...formData,
       [e.target.name]: e.target.value,
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleRegister = async () => {
+    if (
+      !formData.username ||
+      !formData.email ||
+      !formData.phone ||
+      !formData.password ||
+      !formData.confirm_password
+    ) {
+      alert("Please fill all fields");
+      return;
+    }
+
+    if (formData.password !== formData.confirm_password) {
+      alert("Passwords do not match");
+      return;
+    }
 
     try {
-      await registerUser(form);
+      setLoading(true);
+
+      await registerUser(formData);
+
       alert("Registration Successful");
+
       navigate("/login");
-    } catch (err) {
-      console.log(err);
-      alert("Registration Failed");
+    } catch (error) {
+      console.log(error);
+
+      if (error.response) {
+        alert(JSON.stringify(error.response.data));
+      } else {
+        alert("Registration Failed");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div style={{ maxWidth: "400px", margin: "50px auto" }}>
-      <h2>Register</h2>
+    <Container maxWidth="sm" sx={{ py: 8 }}>
+      <Paper
+        elevation={6}
+        sx={{
+          p: 5,
+          borderRadius: 4,
+        }}
+      >
+        <Typography
+          variant="h4"
+          fontWeight="bold"
+          textAlign="center"
+          mb={4}
+        >
+          Create Account
+        </Typography>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          name="username"
-          placeholder="Username"
-          onChange={handleChange}
-        />
-        <br /><br />
+        <Stack spacing={3}>
+          <TextField
+            fullWidth
+            label="Username"
+            name="username"
+            value={formData.username}
+            onChange={handleChange}
+          />
 
-        <input
-          name="email"
-          placeholder="Email"
-          onChange={handleChange}
-        />
-        <br /><br />
+          <TextField
+            fullWidth
+            label="Email"
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={handleChange}
+          />
 
-        <input
-          name="phone"
-          placeholder="Phone"
-          onChange={handleChange}
-        />
-        <br /><br />
+          <TextField
+            fullWidth
+            label="Phone Number"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+          />
 
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          onChange={handleChange}
-        />
-        <br /><br />
+          <TextField
+            fullWidth
+            label="Password"
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+          />
 
-        <input
-          type="password"
-          name="confirm_password"
-          placeholder="Confirm Password"
-          onChange={handleChange}
-        />
-        <br /><br />
+          <TextField
+            fullWidth
+            label="Confirm Password"
+            type="password"
+            name="confirm_password"
+            value={formData.confirm_password}
+            onChange={handleChange}
+          />
 
-        <button type="submit">Register</button>
-      </form>
+          <Button
+            fullWidth
+            size="large"
+            variant="contained"
+            startIcon={
+              loading ? (
+                <CircularProgress
+                  size={20}
+                  color="inherit"
+                />
+              ) : (
+                <PersonAddIcon />
+              )
+            }
+            disabled={loading}
+            onClick={handleRegister}
+            sx={{
+              py: 1.5,
+              fontWeight: "bold",
+              fontSize: 16,
+            }}
+          >
+            {loading ? "Creating Account..." : "Register"}
+          </Button>
 
-      <br />
-
-      <Link to="/login">Already have an account? Login</Link>
-    </div>
+          <Typography textAlign="center">
+            Already have an account?{" "}
+            <Link
+              component="button"
+              underline="hover"
+              onClick={() => navigate("/login")}
+            >
+              Login
+            </Link>
+          </Typography>
+        </Stack>
+      </Paper>
+    </Container>
   );
 }
 

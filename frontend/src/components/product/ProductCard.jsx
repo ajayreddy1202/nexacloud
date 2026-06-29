@@ -19,6 +19,8 @@ import { addToCart } from "../../redux/slices/cartSlice";
 import { addToWishlist } from "../../redux/slices/wishlistSlice";
 
 function ProductCard({ product }) {
+  console.log("Rendering Product:", product);
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -27,20 +29,14 @@ function ProductCard({ product }) {
   };
 
   const handleWishlist = (e) => {
-    e.preventDefault();
     e.stopPropagation();
-
     dispatch(addToWishlist(product));
-
     alert(`${product.name} added to wishlist`);
   };
 
   const handleAddCart = (e) => {
-    e.preventDefault();
     e.stopPropagation();
-
     dispatch(addToCart(product));
-
     alert(`${product.name} added to cart`);
   };
 
@@ -48,21 +44,29 @@ function ProductCard({ product }) {
     <Card
       onClick={handleCardClick}
       sx={{
-        borderRadius: 4,
+        borderRadius: 3,
         overflow: "hidden",
         cursor: "pointer",
         transition: "0.3s",
         "&:hover": {
           transform: "translateY(-8px)",
-          boxShadow: 10,
+          boxShadow: 8,
         },
       }}
     >
       <CardMedia
         component="img"
         height="250"
-        image={product.image_url}
+        image={
+          product.image_url
+            ? product.image_url
+            : "https://via.placeholder.com/400x300?text=No+Image"
+        }
         alt={product.name}
+        onError={(e) => {
+          e.target.src =
+            "https://via.placeholder.com/400x300?text=Image+Not+Found";
+        }}
       />
 
       <CardContent>
@@ -75,16 +79,16 @@ function ProductCard({ product }) {
         <Typography
           variant="body2"
           color="text.secondary"
-          mt={1}
+          sx={{ mt: 1 }}
         >
           {product.description}
         </Typography>
 
         <Typography
-          variant="h6"
+          variant="h5"
           color="primary"
           fontWeight="bold"
-          mt={2}
+          sx={{ mt: 2 }}
         >
           ₹ {product.price}
         </Typography>
@@ -97,18 +101,15 @@ function ProductCard({ product }) {
 
         <Typography
           variant="body2"
-          color="text.secondary"
-          mt={1}
+          sx={{ mt: 1 }}
         >
           Category: {product.category_name}
         </Typography>
 
-        {/* IMPORTANT: stop click here */}
         <Stack
           direction="row"
           spacing={2}
-          mt={3}
-          onClick={(e) => e.stopPropagation()}
+          sx={{ mt: 3 }}
         >
           <Button
             fullWidth

@@ -16,6 +16,8 @@ import {
   NotificationsNone,
   Search,
   Person,
+  Payment,
+  AdminPanelSettings,
 } from "@mui/icons-material";
 
 import { useSelector, useDispatch } from "react-redux";
@@ -28,11 +30,21 @@ function Navbar() {
   const dispatch = useDispatch();
 
   const cartItems = useSelector((state) => state.cart.items);
-  const wishlistItems = useSelector((state) => state.wishlist.items);
-  const { isAuthenticated } = useSelector((state) => state.auth);
+
+  const wishlistItems = useSelector(
+    (state) => state.wishlist.items
+  );
+
+  const { isAuthenticated } = useSelector(
+    (state) => state.auth
+  );
 
   const handleLogout = () => {
     dispatch(logout());
+
+    localStorage.removeItem("access");
+    localStorage.removeItem("refresh");
+    localStorage.removeItem("user");
 
     alert("Logged Out Successfully");
 
@@ -48,8 +60,6 @@ function Navbar() {
       }}
     >
       <Toolbar sx={{ height: 75 }}>
-        {/* Logo */}
-
         <Typography
           variant="h4"
           fontWeight="bold"
@@ -62,8 +72,6 @@ function Navbar() {
         >
           NexaCloud
         </Typography>
-
-        {/* Search */}
 
         <Box
           sx={{
@@ -100,8 +108,6 @@ function Navbar() {
 
         <Box sx={{ flexGrow: 1 }} />
 
-        {/* Home */}
-
         <Button
           sx={{ color: "white" }}
           onClick={() => navigate("/")}
@@ -109,16 +115,12 @@ function Navbar() {
           Home
         </Button>
 
-        {/* Products */}
-
         <Button
           sx={{ color: "white" }}
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/products")}
         >
           Products
         </Button>
-
-        {/* Orders */}
 
         <Button
           sx={{ color: "white" }}
@@ -127,7 +129,21 @@ function Navbar() {
           Orders
         </Button>
 
-        {/* Wishlist */}
+        <Button
+          sx={{ color: "white" }}
+          startIcon={<Payment />}
+          onClick={() => navigate("/payments")}
+        >
+          Payments
+        </Button>
+
+        <Button
+          sx={{ color: "white" }}
+          startIcon={<AdminPanelSettings />}
+          onClick={() => navigate("/admin")}
+        >
+          Admin
+        </Button>
 
         <IconButton
           color="inherit"
@@ -141,8 +157,6 @@ function Navbar() {
           </Badge>
         </IconButton>
 
-        {/* Cart */}
-
         <IconButton
           color="inherit"
           onClick={() => navigate("/cart")}
@@ -155,18 +169,17 @@ function Navbar() {
           </Badge>
         </IconButton>
 
-        {/* Notifications */}
-
-        <IconButton color="inherit">
+        <IconButton
+          color="inherit"
+          onClick={() => navigate("/notifications")}
+        >
           <Badge
-            badgeContent={5}
+            badgeContent={1}
             color="success"
           >
             <NotificationsNone />
           </Badge>
         </IconButton>
-
-        {/* Login / Logout */}
 
         {isAuthenticated ? (
           <Button
@@ -178,21 +191,33 @@ function Navbar() {
             Logout
           </Button>
         ) : (
-          <Button
-            variant="contained"
-            sx={{
-              ml: 2,
-              bgcolor: "#ff9900",
-              color: "black",
-              fontWeight: "bold",
-            }}
-            onClick={() => navigate("/login")}
-          >
-            Login
-          </Button>
-        )}
+          <>
+            <Button
+              variant="outlined"
+              sx={{
+                ml: 2,
+                color: "white",
+                borderColor: "white",
+              }}
+              onClick={() => navigate("/register")}
+            >
+              Register
+            </Button>
 
-        {/* Profile */}
+            <Button
+              variant="contained"
+              sx={{
+                ml: 2,
+                bgcolor: "#ff9900",
+                color: "black",
+                fontWeight: "bold",
+              }}
+              onClick={() => navigate("/login")}
+            >
+              Login
+            </Button>
+          </>
+        )}
 
         <Avatar
           sx={{
@@ -200,7 +225,11 @@ function Navbar() {
             bgcolor: "#ff9900",
             cursor: "pointer",
           }}
-          onClick={() => navigate("/login")}
+          onClick={() =>
+            navigate(
+              isAuthenticated ? "/profile" : "/login"
+            )
+          }
         >
           <Person />
         </Avatar>
