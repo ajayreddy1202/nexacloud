@@ -11,7 +11,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 git branch: 'main',
-                url: 'https://github.com/ajayreddy1202/nexacloud.git'
+                    url: 'https://github.com/ajayreddy1202/nexacloud.git'
             }
         }
 
@@ -30,7 +30,10 @@ pipeline {
 
         stage('Deploy Containers') {
             steps {
-                sh 'docker compose up -d'
+                sh '''
+                    docker compose down || true
+                    docker compose up -d --build
+                '''
             }
         }
 
