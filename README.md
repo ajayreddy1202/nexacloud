@@ -99,11 +99,11 @@ Grafana
 
 | Service | URL |
 |---------|-----|
-| 🌐 Frontend | http://15.206.131.219 |
-| 🔧 Jenkins | http://15.206.131.219:8081 |
-| 🔍 SonarQube | http://15.206.131.219:9000 |
-| 📊 Prometheus | http://15.206.131.219:9090 |
-| 📈 Grafana | http://15.206.131.219:3000 |
+| 🌐 Frontend | http://13.205.151.224 |
+| 🔧 Jenkins | http://13.205.151.224:8081 |
+| 🔍 SonarQube | http://13.205.151.224:9000 |
+| 📊 Prometheus | http://13.205.151.224:9090 |
+| 📈 Grafana | http://13.205.151.224:3000 |
 
 ---
 
@@ -111,12 +111,12 @@ Grafana
 
 | API | Endpoint |
 |-----|----------|
-| 🔐 Auth API | http://15.206.131.219:8000/api/auth/register/ |
-| 👤 User API | http://15.206.131.219:8001/api/users/profiles/ |
-| 📦 Product API | http://15.206.131.219:8002/api/products/ |
-| 🛒 Order API | http://15.206.131.219:8003/api/orders/ |
-| 🔔 Notification API | http://15.206.131.219:8004/api/notifications/ |
-| 💳 Payment API | http://15.206.131.219:8005/api/payments/ |
+| 🔐 Auth API | http://13.205.151.224:8000/api/auth/register/ |
+| 👤 User API | http://13.205.151.224:8001/api/users/profiles/ |
+| 📦 Product API | http://13.205.151.224:8002/api/products/ |
+| 🛒 Order API | http://13.205.151.224:8003/api/orders/ |
+| 🔔 Notification API | http://13.205.151.224:8004/api/notifications/ |
+| 💳 Payment API | http://13.205.151.224:8005/api/payments/ |
 
 ---
 
