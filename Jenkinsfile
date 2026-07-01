@@ -1,10 +1,8 @@
 pipeline {
-
     agent any
 
     environment {
-        PROJECT_NAME = "nexacloud"
-        SCANNER_HOME = tool 'SonarScanner'
+        PROJECT_DIR = "/home/ubuntu/nexacloud"
     }
 
     stages {
@@ -12,15 +10,15 @@ pipeline {
         stage('Checkout') {
             steps {
                 git branch: 'main',
-                    url: 'https://github.com/ajayreddy1202/nexacloud.git'
+                url: 'https://github.com/ajayreddy1202/nexacloud.git'
             }
         }
 
         stage('Show Files') {
             steps {
                 sh '''
-                    pwd
-                    ls -la
+                pwd
+                ls -la
                 '''
             }
         }
@@ -28,70 +26,51 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    sh """
-                        cd /home/ubuntu/nexacloud
-
-                        ${SCANNER_HOME}/bin/sonar-scanner \
-                        -Dproject.settings=sonar-project.properties \
-                        -Dsonar.host.url=$SONAR_HOST_URL \
-                        -Dsonar.token=$SONAR_AUTH_TOKEN
-                    """
+                    sh '''
+                    sonar-scanner
+                    '''
                 }
             }
         }
 
         stage('Build Docker Images') {
             steps {
-                timeout(time: 30, unit: 'MINUTES') {
-                    sh '''
-                        cd /home/ubuntu/nexacloud
-
-                        docker compose build --no-cache
-                    '''
-                }
+                sh """
+                cd ${PROJECT_DIR}
+                docker compose build
+                """
             }
         }
 
         stage('Deploy Containers') {
             steps {
-                timeout(time: 15, unit: 'MINUTES') {
-                    sh '''
-                        cd /home/ubuntu/nexacloud
-
-                        docker compose down || true
-
-                        docker compose up -d
-                    '''
-                }
+                sh """
+                cd ${PROJECT_DIR}
+                docker compose up -d
+                """
             }
         }
 
         stage('Verify Deployment') {
             steps {
                 sh '''
-                    docker ps
+                docker ps
                 '''
             }
         }
-
     }
 
     post {
-
         success {
-            echo "========================================"
-            echo "NexaCloud Deployment Successful"
-            echo "========================================"
+            echo '===================================='
+            echo 'NexaCloud Deployment Successful'
+            echo '===================================='
         }
 
         failure {
-            echo "========================================"
-            echo "NexaCloud Deployment Failed"
-            echo "========================================"
-        }
-
-        always {
-            cleanWs()
+            echo '===================================='
+            echo 'NexaCloud Deployment Failed'
+            echo '===================================='
         }
     }
 }
