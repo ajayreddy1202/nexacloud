@@ -7,16 +7,17 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
+        stage('Checkout Source Code') {
             steps {
                 git branch: 'main',
-                url: 'https://github.com/ajayreddy1202/nexacloud.git'
+                    url: 'https://github.com/ajayreddy1202/nexacloud.git'
             }
         }
 
-        stage('Show Files') {
+        stage('Show Workspace') {
             steps {
                 sh '''
+                echo "Current Workspace:"
                 pwd
                 ls -la
                 '''
@@ -25,10 +26,16 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh '''
-                    sonar-scanner
-                    '''
+                script {
+                    def scannerHome = tool 'SonarScanner'
+
+                    withSonarQubeEnv('SonarQube') {
+
+                        sh """
+                        ${scannerHome}/bin/sonar-scanner \
+                        -Dsonar.projectBaseDir=$WORKSPACE
+                        """
+                    }
                 }
             }
         }
@@ -42,7 +49,7 @@ pipeline {
             }
         }
 
-        stage('Deploy Containers') {
+        stage('Deploy Application') {
             steps {
                 sh """
                 cd ${PROJECT_DIR}
@@ -61,16 +68,21 @@ pipeline {
     }
 
     post {
+
         success {
-            echo '===================================='
-            echo 'NexaCloud Deployment Successful'
-            echo '===================================='
+            echo "======================================="
+            echo " NexaCloud Deployment Successful "
+            echo "======================================="
         }
 
         failure {
-            echo '===================================='
-            echo 'NexaCloud Deployment Failed'
-            echo '===================================='
+            echo "======================================="
+            echo " NexaCloud Deployment Failed "
+            echo "======================================="
+        }
+
+        always {
+            cleanWs()
         }
     }
 }
