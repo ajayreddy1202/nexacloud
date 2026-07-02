@@ -9,5 +9,8 @@ db.sqlite3
 .aws/
 .vscode/
 .DS_Store
-Thumbs.dbkubectl
+Thumbs.db
+kubectl
 .scannerwork/
+aws/
+awscliv2.zip
